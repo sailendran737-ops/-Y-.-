@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jatra Share</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green:#00C853; --green-dark:#00952A; --green-light:#E8F9EE;
+  --blue:#1A6EFF; --blue-light:#E8F0FF; --blue-dark:#0044CC;
+  --purple:#7C3AED; --purple-light:#F3EEFF;
+  --orange:#FF6D00; --orange-light:#FFF0E6;
+  --bg:#F4F6FB; --card:#FFFFFF; --text:#0D1B2A; --text2:#4A5568;
+  --muted:#8A96A8; --border:#E2E8F0; --red:#F03E3E;
+  --shadow:0 2px 16px rgba(0,0,0,0.07); --shadow-md:0 6px 28px rgba(0,0,0,0.11);
+  --radius:20px; --radius-sm:12px;
+  --tab-bg:#FFFFFF; --input-bg:#F7F9FC; --modal-bg:#FFFFFF;
+  --overlay:rgba(10,20,40,0.6);
+}
+[data-theme="dark"] {
+  --bg:#0A0F1E; --card:#141B2D; --text:#EEF2FF; --text2:#94A3C4;
+  --muted:#5A6480; --border:#1E2A42; --tab-bg:#141B2D; --input-bg:#1A2338;
+  --modal-bg:#141B2D; --overlay:rgba(0,0,0,0.8);
+  --green-light:#0A2015; --blue-light:#0A1530; --purple-light:#160D2E; --orange-light:#1E1008;
+  --shadow:0 2px 16px rgba(0,0,0,0.3); --shadow-md:0 6px 28px rgba(0,0,0,0.45);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;transition:background .3s,color .3s;-webkit-font-smoothing:antialiased;}
+.header{background:var(--card);padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;border-bottom:1px solid var(--border);}
+.logo-wrap{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,#00C853,#1A6EFF);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.logo-text{font-size:1.25rem;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
+.logo-text span{color:var(--blue);}
+.hdr-right{display:flex;align-items:center;gap:8px;}
+.hdr-icon-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:var(--input-bg);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.95rem;transition:all .2s;position:relative;}
+.hdr-icon-btn:hover{background:var(--blue-light);border-color:var(--blue);}
+.hdr-notif-dot{position:absolute;top:3px;right:3px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid var(--card);}
+.avatar-btn{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:.8rem;}
+.panel{display:none;padding:20px 16px;}
+.panel.active{display:block;}
+.hero-card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-md);border:1px solid var(--border);margin-bottom:16px;}
+.hero-greeting{font-size:.78rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;}
+.hero-title{font-size:1.35rem;font-weight:800;color:var(--text);margin-bottom:18px;line-height:1.3;}
+.hero-title span{color:var(--blue);}
+.ride-type-row{display:flex;gap:10px;margin-bottom:18px;}
+.ride-type-pill{flex:1;padding:12px 8px;border-radius:14px;border:2px solid var(--border);background:var(--input-bg);cursor:pointer;text-align:center;transition:all .22s;position:relative;overflow:hidden;}
+.ride-type-pill.active-seat{border-color:var(--green);background:var(--green-light);}
+.ride-type-pill.active-trip{border-color:var(--blue);background:var(--blue-light);}
+.rtp-icon{font-size:1.4rem;margin-bottom:4px;}
+.rtp-label{font-size:.78rem;font-weight:700;color:var(--text2);}
+.ride-type-pill.active-seat .rtp-label{color:var(--green-dark);}
+.ride-type-pill.active-trip .rtp-label{color:var(--blue-dark);}
+.rtp-sub{font-size:.62rem;color:var(--muted);margin-top:1px;}
+.rtp-check{position:absolute;top:6px;right:7px;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.55rem;color:white;display:none;}
+.ride-type-pill.active-seat .rtp-check{display:flex;background:var(--green);}
+.ride-type-pill.active-trip .rtp-check{display:flex;background:var(--blue);}
+.route-inputs{background:var(--input-bg);border-radius:16px;border:1.5px solid var(--border);overflow:hidden;margin-bottom:14px;}
+.route-row{display:flex;align-items:center;padding:13px 14px;gap:12px;position:relative;}
+.route-row:first-child{border-bottom:1px solid var(--border);}
+.route-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.route-dot.from{background:var(--blue);}
+.route-dot.to{background:var(--green);}
+.route-input{flex:1;border:none;background:transparent;font-family:'Plus Jakarta Sans',sans-serif;font-size:.95rem;font-weight:600;color:var(--text);outline:none;}
+.route-input::placeholder{color:var(--muted);font-weight:500;}
+.route-swap{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.8rem;flex-shrink:0;transition:all .2s;}
+.route-swap:hover{background:var(--blue-light);border-color:var(--blue);}
+.ac-dropdown{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--card);border:1.5px solid var(--blue);border-radius:14px;box-shadow:var(--shadow-md);z-index:500;max-height:190px;overflow-y:auto;}
+.ac-dropdown.open{display:block;}
+.ac-item{padding:10px 14px;font-size:.87rem;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);transition:background .12s;font-weight:500;}
+.ac-item:last-child{border-bottom:none;}
+.ac-item:hover,.ac-item.hl{background:var(--blue-light);color:var(--blue);}
+.ac-tag{font-size:.63rem;background:var(--border);color:var(--muted);padding:2px 7px;border-radius:6px;margin-left:auto;font-weight:600;}
+.datetime-row{display:flex;gap:10px;margin-bottom:16px;}
+.dt-box{flex:1;background:var(--input-bg);border:1.5px solid var(--border);border-radius:13px;padding:12px 13px;cursor:pointer;transition:border-color .2s;}
+.dt-box:focus-within{border-color:var(--blue);}
+.dt-label{font-size:.62rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
+.dt-val{font-size:.88rem;font-weight:700;color:var(--text);}
+.dt-input{width:100%;border:none;background:transparent;font-family:'Plus Jakarta Sans',sans-serif;font-size:.88rem;font-weight:700;color:var(--text);outline:none;cursor:pointer;}
+.search-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--blue) 0%,var(--purple) 100%);color:white;font-family:'Plus Jakarta Sans',sans-serif;font-size:1rem;font-weight:700;border:none;border-radius:14px;cursor:pointer;box-shadow:0 4px 18px rgba(26,110,255,0.35);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.search-btn:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(26,110,255,0.45);}
+.chips-row{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap;}
+.chip{display:inline-flex;align-items:center;gap:5px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:6px 13px;font-size:.76rem;font-weight:600;color:var(--text2);cursor:pointer;transition:all .2s;}
+.chip.active{background:var(--blue);border-color:var(--blue);color:white;}
+.stats-bar{display:flex;align-items:center;justify-content:space-between;background:var(--card);border-radius:11px;padding:9px 14px;margin-bottom:12px;border:1px solid var(--border);font-size:.76rem;color:var(--muted);}
+.stats-count{font-weight:800;color:var(--blue);font-size:.95rem;}
+.rides-list{display:flex;flex-direction:column;gap:12px;}
+.ride-card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);border:1px solid var(--border);position:relative;overflow:hidden;animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.ride-card.is-full{border-color:#FFCDD2;opacity:.85;}
+.ride-card.mine-card{border-color:var(--blue);border-width:1.5px;}
+.card-type-band{position:absolute;top:0;left:0;right:0;height:3px;}
+.band-seat{background:linear-gradient(90deg,var(--green),#00E676);}
+.band-trip{background:linear-gradient(90deg,var(--blue),var(--purple));}
+.band-mine{background:linear-gradient(90deg,var(--orange),#FFAB40);}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;margin-top:6px;}
+.driver-row{display:flex;align-items:center;gap:10px;}
+.d-avatar{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;color:white;overflow:hidden;flex-shrink:0;}
+.d-avatar img{width:100%;height:100%;object-fit:cover;border-radius:14px;}
+.d-name{font-weight:700;font-size:.93rem;color:var(--text);display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.d-sub{font-size:.72rem;color:var(--muted);margin-top:2px;font-weight:500;}
+.fare-pill{background:var(--green-light);color:var(--green-dark);font-weight:800;font-size:.95rem;padding:6px 13px;border-radius:20px;border:1.5px solid rgba(0,200,83,0.3);}
+.fare-pill.trip-fare{background:var(--blue-light);color:var(--blue-dark);border-color:rgba(26,110,255,0.25);}
+.tag-full{background:#FFEBEE;color:var(--red);font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:7px;}
+.tag-mine{background:var(--orange-light);color:var(--orange);font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:7px;}
+.tag-type{font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:7px;}
+.tag-seat{background:var(--green-light);color:var(--green-dark);}
+.tag-trip{background:var(--blue-light);color:var(--blue-dark);}
+.route-band{display:flex;align-items:center;gap:6px;background:var(--bg);border-radius:10px;padding:8px 11px;margin-bottom:11px;font-size:.78rem;font-weight:700;}
+.rb-from{color:var(--blue);}
+.rb-arrow{color:var(--muted);font-size:.85rem;}
+.rb-to{color:var(--green-dark);}
+.star-line{color:#F59E0B;font-size:.8rem;margin-bottom:10px;font-weight:600;}
+.info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:11px;}
+.ig{background:var(--bg);border-radius:10px;padding:7px 4px;text-align:center;}
+.ig-l{font-size:.57rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.3px;}
+.ig-v{font-size:.76rem;font-weight:700;color:var(--text);margin-top:2px;}
+.sbar-wrap{margin-bottom:11px;}
+.sbar-meta{display:flex;justify-content:space-between;font-size:.7rem;font-weight:600;color:var(--muted);margin-bottom:4px;}
+.sbar-avail{color:var(--green-dark);}
+.sbar-full-txt{color:var(--red);}
+.sbar-bg{background:var(--border);border-radius:5px;height:5px;overflow:hidden;}
+.sbar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--green),#00E676);transition:width .4s;}
+.sbar-fill.low{background:linear-gradient(90deg,#F59E0B,#EF4444);}
+.sbar-fill.full{background:linear-gradient(90deg,var(--red),#B91C1C);}
+.actions{display:grid;gap:7px;}
+.actions.three{grid-template-columns:1fr 1fr 1fr;}
+.actions.two{grid-template-columns:1fr 1fr;}
+.abtn{padding:10px 4px;border:none;border-radius:11px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.73rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:4px;}
+.abtn-book{background:var(--green-light);color:var(--green-dark);border:1.5px solid rgba(0,200,83,0.3);}
+.abtn-book:hover:not(:disabled){background:var(--green);color:white;}
+.abtn-book:disabled{background:var(--bg);color:var(--muted);border-color:var(--border);cursor:not-allowed;}
+.abtn-call{background:var(--blue-light);color:var(--blue);border:1.5px solid rgba(26,110,255,0.25);}
+.abtn-call:hover{background:var(--blue);color:white;}
+.abtn-wa{background:#E8F9EE;color:#15803D;border:1.5px solid rgba(0,200,83,0.25);}
+.abtn-wa:hover{background:#25D366;color:white;}
+.abtn-del{background:#FFF1F1;color:var(--red);border:1.5px solid rgba(240,62,62,0.2);}
+.abtn-del:hover{background:var(--red);color:white;}
+.abtn-rate{background:var(--orange-light);color:var(--orange);border:1.5px solid rgba(255,109,0,0.25);width:100%;margin-bottom:7px;}
+.post-type-banner{border-radius:16px;padding:16px;margin-bottom:16px;display:flex;align-items:center;gap:13px;}
+.ptb-seat{background:var(--green-light);border:1.5px solid rgba(0,200,83,0.3);}
+.ptb-trip{background:var(--blue-light);border:1.5px solid rgba(26,110,255,0.25);}
+.ptb-icon{font-size:2rem;}
+.ptb-title{font-weight:800;font-size:1rem;}
+.ptb-sub{font-size:.75rem;color:var(--text2);margin-top:2px;}
+.post-type-toggle{display:flex;background:var(--input-bg);border-radius:13px;padding:4px;gap:4px;margin-bottom:16px;border:1.5px solid var(--border);}
+.ptt-btn{flex:1;padding:10px 6px;border:none;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;transition:all .2s;color:var(--muted);background:transparent;}
+.ptt-btn.active-seat{background:var(--green);color:white;box-shadow:0 2px 10px rgba(0,200,83,0.3);}
+.ptt-btn.active-trip{background:var(--blue);color:white;box-shadow:0 2px 10px rgba(26,110,255,0.3);}
+.form-card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:14px;}
+.form-group{margin-bottom:13px;}
+.form-group:last-child{margin-bottom:0;}
+.field-label{display:block;font-size:.72rem;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;}
+.field-input{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.92rem;font-weight:600;color:var(--text);background:var(--input-bg);transition:border-color .2s;outline:none;appearance:none;}
+.field-input::placeholder{color:var(--muted);font-weight:500;}
+.field-input:focus{border-color:var(--blue);background:var(--card);}
+.input-row{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.pass-wrap{position:relative;}
+.pass-wrap .field-input{padding-right:42px;}
+.pass-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.05rem;color:var(--muted);}
+.photo-area{border:2px dashed var(--border);border-radius:14px;padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:var(--input-bg);position:relative;overflow:hidden;}
+.photo-area:hover{border-color:var(--blue);background:var(--blue-light);}
+.photo-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;z-index:2;}
+.photo-ph-icon{font-size:1.8rem;margin-bottom:3px;}
+.photo-hint{font-size:.75rem;color:var(--muted);font-weight:500;}
+.photo-img{width:64px;height:64px;border-radius:50%;object-fit:cover;border:3px solid var(--green);display:block;margin:0 auto;}
+.photo-rm{position:absolute;top:4px;right:4px;background:var(--red);color:white;border:none;border-radius:50%;width:19px;height:19px;font-size:.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;z-index:3;}
+.route-preview{display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:12px;padding:10px 13px;margin-bottom:13px;border:1.5px solid var(--border);}
+.rp-city{font-weight:700;font-size:.88rem;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rp-city.ph{color:var(--muted);font-weight:500;font-size:.84rem;}
+.rp-arrow{color:var(--blue);font-size:1rem;flex-shrink:0;}
+.swap-btn2{background:var(--card);border:1.5px solid var(--border);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem;transition:all .2s;flex-shrink:0;}
+.swap-btn2:hover{background:var(--blue-light);border-color:var(--blue);}
+.btn-primary{width:100%;padding:14px;background:linear-gradient(135deg,var(--blue),var(--purple));color:white;font-family:'Plus Jakarta Sans',sans-serif;font-size:.97rem;font-weight:700;border:none;border-radius:13px;cursor:pointer;box-shadow:0 4px 16px rgba(26,110,255,0.32);transition:all .2s;}
+.btn-primary:hover{transform:translateY(-1px);}
+.btn-primary.green-btn{background:linear-gradient(135deg,var(--green),var(--green-dark));box-shadow:0 4px 16px rgba(0,200,83,0.3);}
+.btn-ghost{width:100%;padding:11px;background:transparent;color:var(--text2);font-family:'Plus Jakarta Sans',sans-serif;font-size:.88rem;font-weight:600;border:1.5px solid var(--border);border-radius:12px;cursor:pointer;transition:all .2s;}
+.btn-ghost:hover{border-color:var(--blue);color:var(--blue);}
+.my-type-row{display:flex;gap:8px;margin-bottom:16px;}
+.my-type-btn{flex:1;padding:11px 8px;border-radius:13px;border:1.5px solid var(--border);background:var(--card);cursor:pointer;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.8rem;color:var(--muted);transition:all .2s;}
+.my-type-btn.act-seat{border-color:var(--green);color:var(--green-dark);background:var(--green-light);}
+.my-type-btn.act-trip{border-color:var(--blue);color:var(--blue);background:var(--blue-light);}
+.profile-hero{background:linear-gradient(135deg,var(--blue) 0%,var(--purple) 100%);border-radius:var(--radius);padding:24px 20px;text-align:center;color:white;margin-bottom:14px;position:relative;overflow:hidden;}
+.profile-hero::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,0.08);border-radius:50%;}
+.profile-hero::after{content:'';position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;background:rgba(255,255,255,0.06);border-radius:50%;}
+.ph-avatar{width:72px;height:72px;border-radius:50%;background:white;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.5rem;color:var(--blue);overflow:hidden;border:3px solid rgba(255,255,255,0.4);}
+.ph-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.ph-name{font-weight:800;font-size:1.15rem;margin-bottom:3px;}
+.ph-phone{font-size:.8rem;opacity:.8;}
+.profile-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;}
+.ps{background:var(--card);border-radius:13px;padding:11px 6px;text-align:center;border:1px solid var(--border);}
+.ps-val{font-weight:800;font-size:1.1rem;color:var(--blue);}
+.ps-lbl{font-size:.67rem;color:var(--muted);font-weight:600;margin-top:2px;}
+.setting-row{display:flex;align-items:center;justify-content:space-between;background:var(--card);border-radius:13px;padding:14px 16px;border:1px solid var(--border);margin-bottom:10px;cursor:pointer;}
+.sr-left{display:flex;align-items:center;gap:11px;}
+.sr-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;}
+.sr-title{font-weight:700;font-size:.9rem;}
+.sr-sub{font-size:.72rem;color:var(--muted);margin-top:1px;}
+.toggle-switch{position:relative;width:46px;height:25px;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:var(--border);border-radius:25px;cursor:pointer;transition:.28s;}
+.toggle-slider:before{content:'';position:absolute;height:19px;width:19px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.28s;box-shadow:0 1px 4px rgba(0,0,0,0.2);}
+.toggle-switch input:checked+.toggle-slider{background:var(--blue);}
+.toggle-switch input:checked+.toggle-slider:before{transform:translateX(21px);}
+.auth-card{background:var(--card);border-radius:var(--radius);padding:24px 20px;box-shadow:var(--shadow-md);border:1px solid var(--border);margin-bottom:14px;}
+.auth-logo{text-align:center;margin-bottom:18px;}
+.auth-logo-icon{width:56px;height:56px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 10px;}
+.auth-title{font-weight:800;font-size:1.15rem;text-align:center;margin-bottom:3px;}
+.auth-sub{font-size:.82rem;color:var(--muted);text-align:center;margin-bottom:18px;}
+.tab-auth{display:flex;background:var(--input-bg);border-radius:11px;padding:3px;gap:3px;margin-bottom:16px;border:1px solid var(--border);}
+.tab-auth-btn{flex:1;padding:9px;border:none;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.83rem;color:var(--muted);cursor:pointer;transition:all .2s;background:transparent;}
+.tab-auth-btn.active{background:var(--blue);color:white;box-shadow:0 2px 10px rgba(26,110,255,0.3);}
+.modal-overlay{display:none;position:fixed;inset:0;background:var(--overlay);z-index:600;align-items:flex-end;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:var(--modal-bg);border-radius:24px 24px 0 0;padding:24px 22px 36px;width:100%;text-align:center;animation:slideUp .28s ease;}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px;}
+.m-avatar{width:62px;height:62px;border-radius:18px;margin:0 auto 11px;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.3rem;color:white;overflow:hidden;}
+.m-avatar img{width:100%;height:100%;object-fit:cover;border-radius:18px;}
+.m-name{font-weight:800;font-size:1.1rem;margin-bottom:3px;}
+.m-sub{color:var(--muted);font-size:.78rem;margin-bottom:2px;}
+.m-route{color:var(--blue);font-weight:700;font-size:.8rem;margin-bottom:3px;}
+.m-rating{color:#F59E0B;font-size:.85rem;margin-bottom:4px;font-weight:600;}
+.m-phone{font-weight:800;font-size:1.7rem;color:var(--blue);letter-spacing:1px;margin:12px 0;}
+.m-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+.m-btn{padding:13px;border:none;border-radius:13px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.92rem;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:7px;}
+.m-btn-call{background:var(--blue);color:white;}
+.m-btn-wa{background:#25D366;color:white;}
+.m-close{margin-top:10px;width:100%;padding:11px;background:transparent;border:1.5px solid var(--border);border-radius:12px;color:var(--muted);font-family:'Plus Jakarta Sans',sans-serif;font-size:.88rem;cursor:pointer;font-weight:600;}
+.rate-overlay{display:none;position:fixed;inset:0;background:var(--overlay);z-index:600;align-items:flex-end;}
+.rate-overlay.show{display:flex;}
+.rate-box{background:var(--modal-bg);border-radius:24px 24px 0 0;padding:22px 20px 34px;width:100%;animation:slideUp .28s ease;}
+.rate-title{font-weight:800;font-size:1.05rem;text-align:center;margin-bottom:3px;}
+.rate-sub{text-align:center;color:var(--muted);font-size:.8rem;margin-bottom:14px;}
+.star-row{display:flex;justify-content:center;gap:9px;margin-bottom:14px;}
+.star-row span{font-size:2.1rem;cursor:pointer;transition:transform .15s;}
+.star-row span:hover{transform:scale(1.2);}
+.toast{position:fixed;top:74px;left:50%;transform:translateX(-50%) translateY(-14px);background:var(--text);color:var(--card);padding:11px 22px;border-radius:22px;font-weight:700;font-size:.86rem;opacity:0;transition:all .28s;z-index:900;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.2);pointer-events:none;max-width:90vw;text-align:center;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--tab-bg);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr);z-index:300;box-shadow:0 -4px 20px rgba(0,0,0,0.06);padding-bottom:env(safe-area-inset-bottom);}
+.nav-btn{padding:10px 0 8px;background:transparent;border:none;cursor:pointer;font-size:.62rem;font-weight:600;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Plus Jakarta Sans',sans-serif;transition:color .2s;position:relative;}
+.nav-icon-wrap{width:32px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:10px;transition:all .2s;font-size:1.1rem;}
+.nav-btn.active .nav-icon-wrap{background:var(--blue-light);}
+.nav-btn.active{color:var(--blue);}
+.nav-btn.active .nav-icon-wrap.green-nav{background:var(--green-light);}
+.nav-btn.active.green-active{color:var(--green-dark);}
+.empty-state{text-align:center;padding:44px 18px;color:var(--muted);}
+.empty-icon{font-size:2.8rem;margin-bottom:10px;}
+.empty-title{font-weight:700;font-size:1rem;color:var(--text2);}
+.empty-sub{font-size:.82rem;margin-top:5px;line-height:1.55;}
+.sec-title{font-weight:800;font-size:1.08rem;color:var(--text);margin-bottom:14px;}
+.sec-title span{color:var(--blue);}
+/* Sync indicator */
+.sync-badge{display:inline-flex;align-items:center;gap:4px;background:var(--green-light);color:var(--green-dark);font-size:.65rem;font-weight:700;padding:3px 8px;border-radius:8px;border:1px solid rgba(0,200,83,0.25);}
+.sync-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<div class="header">
+  <div class="logo-wrap">
+    <div class="logo-icon">🛣️</div>
+    <div class="logo-text">Jatra<span>Share</span></div>
+  </div>
+  <div class="hdr-right">
+    <div class="sync-badge"><div class="sync-dot"></div>Live</div>
+    <div class="hdr-icon-btn" onclick="switchTab('profile')" title="Notifications">
+      <div class="hdr-notif-dot" id="hdr-notif-dot" style="display:none"></div>
+      🔔
+    </div>
+    <div class="avatar-btn" onclick="switchTab('profile')" id="hdr-avatar">JS</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ══ PANEL: FIND ══ -->
+<div class="panel active" id="panel-search">
+  <div class="hero-card">
+    <div class="hero-greeting">Good day, Traveller 👋</div>
+    <div class="hero-title">Where are you<br><span>headed today?</span></div>
+
+    <div class="ride-type-row">
+      <div class="ride-type-pill active-seat" id="rt-seat" onclick="setRideType('seat')">
+        <div class="rtp-check">✓</div>
+        <div class="rtp-icon">💺</div>
+        <div class="rtp-label">Seat Share</div>
+        <div class="rtp-sub">Share a seat</div>
+      </div>
+      <div class="ride-type-pill" id="rt-trip" onclick="setRideType('trip')">
+        <div class="rtp-check">✓</div>
+        <div class="rtp-icon">🚗</div>
+        <div class="rtp-label">Trip Share</div>
+        <div class="rtp-sub">Full car trip</div>
+      </div>
+    </div>
+
+    <div class="route-inputs" style="position:relative">
+      <div class="route-row">
+        <div class="route-dot from"></div>
+        <input class="route-input" id="s-from" type="text"
+          placeholder="From — Pickup city or town"
+          autocomplete="off"
+          oninput="acInput(this,'s-from-dd')" onkeydown="acKey(event,'s-from-dd')"
+          onfocus="acInput(this,'s-from-dd')" onblur="acBlur('s-from-dd')">
+        <div class="route-swap" onclick="swapSearch()">⇅</div>
+        <div class="ac-dropdown" id="s-from-dd" style="top:44px"></div>
+      </div>
+      <div class="route-row">
+        <div class="route-dot to"></div>
+        <input class="route-input" id="s-to" type="text"
+          placeholder="To — Drop city or town"
+          autocomplete="off"
+          oninput="acInput(this,'s-to-dd')" onkeydown="acKey(event,'s-to-dd')"
+          onfocus="acInput(this,'s-to-dd')" onblur="acBlur('s-to-dd')">
+        <div class="ac-dropdown" id="s-to-dd" style="top:44px"></div>
+      </div>
+    </div>
+
+    <div class="datetime-row">
+      <div class="dt-box">
+        <div class="dt-label">📅 Date</div>
+        <input type="date" class="dt-input" id="s-date">
+      </div>
+      <div class="dt-box">
+        <div class="dt-label">⏰ Depart After</div>
+        <input type="time" class="dt-input" id="s-time">
+      </div>
+    </div>
+
+    <button class="search-btn" onclick="searchRides()">
+      <span>🔍</span> Search Rides
+    </button>
+  </div>
+
+  <div class="chips-row" id="filter-chips" style="display:none">
+    <span class="chip active" onclick="filterPrice(0)"   id="chip-all">All Prices</span>
+    <span class="chip"        onclick="filterPrice(300)" id="chip-300">Under ₹300</span>
+    <span class="chip"        onclick="filterPrice(400)" id="chip-400">Under ₹400</span>
+    <span class="chip"        onclick="filterPrice(500)" id="chip-500">Under ₹500</span>
+  </div>
+  <div id="stats-bar" style="display:none" class="stats-bar">
+    <span><span class="stats-count" id="ride-count">0</span> rides found</span>
+    <span id="route-tag" style="font-weight:700;color:var(--blue);font-size:.76rem"></span>
+  </div>
+  <div class="rides-list" id="rides-container">
+    <div class="empty-state">
+      <div class="empty-icon">🗺️</div>
+      <div class="empty-title">Ready to find your ride?</div>
+      <div class="empty-sub">Select ride type, enter pickup and drop locations, then tap Search.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PANEL: POST ══ -->
+<div class="panel" id="panel-post">
+  <div class="sec-title">Post a <span>Ride</span></div>
+
+  <div class="post-type-toggle">
+    <button class="ptt-btn active-seat" id="ptt-seat" onclick="setPostType('seat')">💺 Seat Share</button>
+    <button class="ptt-btn"             id="ptt-trip" onclick="setPostType('trip')">🚗 Trip Share</button>
+  </div>
+
+  <div class="post-type-banner ptb-seat" id="ptb-banner">
+    <div class="ptb-icon">💺</div>
+    <div>
+      <div class="ptb-title" id="ptb-title">Seat Share</div>
+      <div class="ptb-sub"   id="ptb-sub">Offer spare seats in your vehicle</div>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <div class="form-group">
+      <label class="field-label">Profile Photo (optional)</label>
+      <div class="photo-area" id="photo-area">
+        <input type="file" id="photo-file" accept="image/*" onchange="handlePhoto(event)">
+        <div id="photo-ph-block"><div class="photo-ph-icon">📸</div><div class="photo-hint">Tap to upload your photo</div></div>
+        <div id="photo-pw" style="display:none;position:relative;display:inline-block;display:none;">
+          <img id="photo-img" class="photo-img" src="" alt="">
+          <button class="photo-rm" id="photo-rm-btn" onclick="removePhoto(event)">✕</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="route-preview">
+      <div class="rp-city ph" id="preview-from">From city…</div>
+      <div class="rp-arrow">→</div>
+      <div class="rp-city ph" id="preview-to">To city…</div>
+      <button class="swap-btn2" type="button" onclick="swapRoute()">⇄</button>
+    </div>
+
+    <div class="input-row" style="margin-bottom:13px">
+      <div class="form-group" style="margin:0;position:relative">
+        <label class="field-label">From *</label>
+        <input class="field-input" id="d-from" type="text" placeholder="Pickup city or town"
+          autocomplete="off"
+          oninput="acInput(this,'d-from-dd');updatePreview()"
+          onkeydown="acKey(event,'d-from-dd')"
+          onfocus="acInput(this,'d-from-dd')" onblur="acBlur('d-from-dd');updatePreview()">
+        <div class="ac-dropdown" id="d-from-dd"></div>
+      </div>
+      <div class="form-group" style="margin:0;position:relative">
+        <label class="field-label">To *</label>
+        <input class="field-input" id="d-to" type="text" placeholder="Drop city or town"
+          autocomplete="off"
+          oninput="acInput(this,'d-to-dd');updatePreview()"
+          onkeydown="acKey(event,'d-to-dd')"
+          onfocus="acInput(this,'d-to-dd')" onblur="acBlur('d-to-dd');updatePreview()">
+        <div class="ac-dropdown" id="d-to-dd"></div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="field-label">Driver Name *</label>
+      <input class="field-input" type="text" id="d-name" placeholder="Enter your full name">
+    </div>
+    <div class="form-group">
+      <label class="field-label">Phone Number *</label>
+      <input class="field-input" type="tel" id="d-phone" placeholder="10-digit mobile number" maxlength="10">
+    </div>
+
+    <div class="input-row">
+      <div class="form-group" style="margin:0">
+        <label class="field-label">Journey Date *</label>
+        <input class="field-input" type="date" id="d-date">
+      </div>
+      <div class="form-group" style="margin:0">
+        <label class="field-label">Departure Time *</label>
+        <input class="field-input" type="time" id="d-time">
+      </div>
+    </div>
+    <div style="height:12px"></div>
+    <div class="input-row">
+      <div class="form-group" style="margin:0">
+        <label class="field-label">Total Seats *</label>
+        <select class="field-input" id="d-seats">
+          <option value="1">1 Seat</option>
+          <option value="2">2 Seats</option>
+          <option value="3">3 Seats</option>
+          <option value="4">4 Seats</option>
+          <option value="5">5 Seats</option>
+          <option value="6">6 Seats</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label class="field-label">Fare per Seat (₹) *</label>
+        <input class="field-input" type="number" id="d-fare" value="300" min="50" max="5000">
+      </div>
+    </div>
+    <div style="height:12px"></div>
+    <div class="form-group">
+      <label class="field-label">Vehicle *</label>
+      <select class="field-input" id="d-vehicle">
+        <option value="Maruti Alto">🚗 Maruti Alto</option>
+        <option value="Maruti Swift">🚗 Maruti Swift</option>
+        <option value="Maruti Dzire">🚗 Maruti Dzire</option>
+        <option value="Honda City">🚗 Honda City</option>
+        <option value="Hyundai i20">🚗 Hyundai i20</option>
+        <option value="Toyota Innova">🚙 Toyota Innova</option>
+        <option value="Toyota Fortuner">🚙 Toyota Fortuner</option>
+        <option value="Mahindra Scorpio">🚙 Mahindra Scorpio</option>
+        <option value="Bolero">🚙 Bolero</option>
+        <option value="Tata Nexon">🚗 Tata Nexon</option>
+        <option value="Other">🚗 Other</option>
+      </select>
+    </div>
+    <button class="btn-primary green-btn" id="post-btn" onclick="postRide()">✅ Post My Ride</button>
+  </div>
+</div>
+
+<!-- ══ PANEL: MY RIDES ══ -->
+<div class="panel" id="panel-myrides">
+  <div class="sec-title">My <span>Rides</span></div>
+  <div class="my-type-row">
+    <button class="my-type-btn act-seat" id="my-seat-btn" onclick="setMyTab('seat')">💺 Seat Share</button>
+    <button class="my-type-btn"          id="my-trip-btn" onclick="setMyTab('trip')">🚗 Trip Share</button>
+  </div>
+  <div id="my-rides-container">
+    <div class="empty-state">
+      <div class="empty-icon">🚗</div>
+      <div class="empty-title">No rides posted yet</div>
+      <div class="empty-sub">Post a ride to see and manage it here.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PANEL: PROFILE ══ -->
+<div class="panel" id="panel-profile">
+  <div id="view-login">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="auth-logo-icon">🛣️</div>
+        <div class="auth-title">Welcome to Jatra Share</div>
+        <div class="auth-sub">Sign in or create your account to continue</div>
+      </div>
+      <div class="tab-auth">
+        <button class="tab-auth-btn active" id="tab-signin" onclick="authTab('signin')">Sign In</button>
+        <button class="tab-auth-btn"        id="tab-signup" onclick="authTab('signup')">Sign Up</button>
+      </div>
+      <div id="auth-signin">
+        <div class="form-group">
+          <label class="field-label">Phone Number</label>
+          <input class="field-input" type="tel" id="li-phone" placeholder="Enter your 10-digit number" maxlength="10">
+        </div>
+        <div class="form-group">
+          <label class="field-label">Password</label>
+          <div class="pass-wrap">
+            <input class="field-input" type="password" id="li-pass" placeholder="Enter your password">
+            <button class="pass-eye" onclick="togglePass('li-pass')">👁</button>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="doLogin()" style="margin-bottom:10px">🔐 Sign In</button>
+        <button class="btn-ghost" onclick="demoLogin()">👀 Try Demo Account</button>
+      </div>
+      <div id="auth-signup" style="display:none">
+        <div class="form-group">
+          <label class="field-label">Full Name</label>
+          <input class="field-input" type="text" id="su-name" placeholder="Enter your full name">
+        </div>
+        <div class="form-group">
+          <label class="field-label">Phone Number</label>
+          <input class="field-input" type="tel" id="su-phone" placeholder="Enter your 10-digit number" maxlength="10">
+        </div>
+        <div class="form-group">
+          <label class="field-label">Create Password</label>
+          <div class="pass-wrap">
+            <input class="field-input" type="password" id="su-pass" placeholder="Create a strong password">
+            <button class="pass-eye" onclick="togglePass('su-pass')">👁</button>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="doSignup()">✅ Create Account</button>
+      </div>
+    </div>
+  </div>
+  <div id="view-profile" style="display:none">
+    <div class="profile-hero">
+      <div class="ph-avatar" id="profile-avatar">JS</div>
+      <div class="ph-name" id="profile-name">User</div>
+      <div class="ph-phone" id="profile-phone">—</div>
+    </div>
+    <div class="profile-stats">
+      <div class="ps"><div class="ps-val" id="stat-rides">0</div><div class="ps-lbl">Rides Posted</div></div>
+      <div class="ps"><div class="ps-val" id="stat-rating">—</div><div class="ps-lbl">Avg Rating</div></div>
+      <div class="ps"><div class="ps-val" id="stat-bookings">0</div><div class="ps-lbl">Bookings</div></div>
+    </div>
+    <div class="setting-row" onclick="switchTab('myrides')">
+      <div class="sr-left">
+        <div class="sr-icon" style="background:var(--blue-light)">📋</div>
+        <div><div class="sr-title">My Posted Rides</div><div class="sr-sub">View and manage your rides</div></div>
+      </div>
+      <span style="color:var(--muted)">›</span>
+    </div>
+    <div class="setting-row">
+      <div class="sr-left">
+        <div class="sr-icon" style="background:var(--purple-light)">🌙</div>
+        <div><div class="sr-title">Dark Mode</div><div class="sr-sub">Switch to dark theme</div></div>
+      </div>
+      <label class="toggle-switch"><input type="checkbox" id="dark-toggle" onchange="toggleDark()"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="setting-row">
+      <div class="sr-left">
+        <div class="sr-icon" style="background:var(--green-light)">🔔</div>
+        <div><div class="sr-title">Ride Alerts</div><div class="sr-sub">Get notified of new rides</div></div>
+      </div>
+      <label class="toggle-switch"><input type="checkbox" id="alert-toggle" checked><span class="toggle-slider"></span></label>
+    </div>
+    <button class="btn-ghost" style="margin-top:6px" onclick="doLogout()">🚪 Sign Out</button>
+  </div>
+</div>
+
+<!-- CONTACT MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeMBg(event)">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="m-avatar"  id="m-avatar"></div>
+    <div class="m-name"    id="m-name"></div>
+    <div class="m-sub"     id="m-vehicle"></div>
+    <div class="m-route"   id="m-route"></div>
+    <div class="m-rating"  id="m-rating"></div>
+    <div class="m-phone"   id="m-phone"></div>
+    <div class="m-actions">
+      <a class="m-btn m-btn-call" id="m-call" href="#">📞 Call Now</a>
+      <a class="m-btn m-btn-wa"   id="m-wa"   href="#" target="_blank">💬 WhatsApp</a>
+    </div>
+    <button class="m-close" onclick="closeModal()">✕ Close</button>
+  </div>
+</div>
+
+<!-- RATING MODAL -->
+<div class="rate-overlay" id="rate-modal" onclick="closeRateMBg(event)">
+  <div class="rate-box">
+    <div class="modal-handle"></div>
+    <div class="rate-title">Rate this Driver ⭐</div>
+    <div class="rate-sub" id="rate-modal-sub"></div>
+    <div class="star-row" id="star-rate-row">
+      <span onclick="setRating(1)">⭐</span>
+      <span onclick="setRating(2)">⭐</span>
+      <span onclick="setRating(3)">⭐</span>
+      <span onclick="setRating(4)">⭐</span>
+      <span onclick="setRating(5)">⭐</span>
+    </div>
+    <div class="form-group">
+      <textarea class="field-input" id="rate-comment" rows="2"
+        placeholder="Share your experience (optional)…" style="resize:none;"></textarea>
+    </div>
+    <button class="btn-primary" onclick="submitRating()">Submit Rating</button>
+    <button class="m-close" style="margin-top:8px;width:100%;display:block" onclick="closeRateModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- ══ BOTTOM NAV — 4 items ══ -->
+<div class="bottom-nav">
+  <button class="nav-btn active" id="nav-search"  onclick="switchTab('search')">
+    <div class="nav-icon-wrap">🔍</div>Find
+  </button>
+  <button class="nav-btn"        id="nav-post"    onclick="switchTab('post')">
+    <div class="nav-icon-wrap">➕</div>Post
+  </button>
+  <button class="nav-btn"        id="nav-myrides" onclick="switchTab('myrides')">
+    <div class="nav-icon-wrap green-nav">🗂</div>My Rides
+  </button>
+  <button class="nav-btn"        id="nav-profile" onclick="switchTab('profile')">
+    <div class="nav-icon-wrap">👤</div>Profile
+  </button>
+</div>
+
+<script>
+// ════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════
+const getTodayStr    = () => new Date().toISOString().split('T')[0];
+const getTomorrowStr = () => { const d=new Date(); d.setDate(d.getDate()+1); return d.toISOString().split('T')[0]; };
+const fmtDate = s => {
+  if(!s) return '';
+  const [y,m,d] = s.split('-');
+  return `${parseInt(d)} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(m)-1]}`;
+};
+const to12hr = t => {
+  if(!t) return '';
+  let [h,m] = t.split(':').map(Number);
+  const ap = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  return `${h}:${String(m).padStart(2,'0')} ${ap}`;
+};
+const fmtPhone  = p => p.replace(/(\d{5})(\d{5})/, '$1 $2');
+const toMins    = t => { const [h,m] = t.split(':').map(Number); return h*60+m; };
+const initials  = n => n.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+
+// ════════════════════════════════════════════
+//  localStorage SYNC HELPERS
+// ════════════════════════════════════════════
+const LS_RIDES   = 'jatra_rides_v1';
+const LS_USERS   = 'jatra_users_v1';
+const LS_SESSION = 'jatra_session_v1';
+const LS_DARK    = 'jatra_dark_v1';
+
+function saveRides() {
+  // Strip photo data before saving to keep localStorage lean (photos stay in memory only)
+  const toSave = rides.map(r => ({...r, photo: r.photo ? '__HAS_PHOTO__' : null}));
+  try { localStorage.setItem(LS_RIDES, JSON.stringify(toSave)); } catch(e) { console.warn('localStorage full'); }
+}
+function loadRides() {
+  try {
+    const raw = localStorage.getItem(LS_RIDES);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      // Restore rides; photo placeholder becomes null (photos can't persist across sessions)
+      return parsed.map(r => ({...r, photo: (r.photo === '__HAS_PHOTO__') ? null : r.photo}));
+    }
+  } catch(e) {}
+  return null;
+}
+function saveUsers() {
+  try { localStorage.setItem(LS_USERS, JSON.stringify(users)); } catch(e) {}
+}
+function loadUsers() {
+  try {
+    const raw = localStorage.getItem(LS_USERS);
+    if (raw) { const u = JSON.parse(raw); Object.assign(users, u); }
+  } catch(e) {}
+}
+function saveSession(phone) {
+  try { localStorage.setItem(LS_SESSION, phone || ''); } catch(e) {}
+}
+function loadSession() {
+  try { return localStorage.getItem(LS_SESSION) || ''; } catch(e) { return ''; }
+}
+
+// ════════════════════════════════════════════
+//  SEED DATA (used only when localStorage is empty)
+// ════════════════════════════════════════════
+const SEED_RIDES = [
+  {id:1, name:"Rajib Kalita",   phone:"9876543210", from:"Guwahati", to:"Tezpur",    time:"08:00", date:getTodayStr(),    totalSeats:3, bookedSeats:0, fare:280, vehicle:"Maruti Swift",    photo:null, ratings:[], postedBy:null, type:'seat'},
+  {id:2, name:"Priya Devi",     phone:"9101234567", from:"Guwahati", to:"Tezpur",    time:"10:30", date:getTodayStr(),    totalSeats:2, bookedSeats:1, fare:320, vehicle:"Honda City",      photo:null, ratings:[4,5], postedBy:null, type:'seat'},
+  {id:3, name:"Bikash Nath",    phone:"8876543210", from:"Guwahati", to:"Tezpur",    time:"14:00", date:getTodayStr(),    totalSeats:4, bookedSeats:0, fare:250, vehicle:"Toyota Innova",   photo:null, ratings:[5,4,5], postedBy:null, type:'trip'},
+  {id:4, name:"Mina Baruah",    phone:"7002345678", from:"Tezpur",   to:"Guwahati",  time:"07:00", date:getTodayStr(),    totalSeats:2, bookedSeats:0, fare:300, vehicle:"Maruti Alto",     photo:null, ratings:[3], postedBy:null, type:'seat'},
+  {id:5, name:"Amit Sharma",    phone:"9435012345", from:"Guwahati", to:"Jorhat",    time:"09:00", date:getTodayStr(),    totalSeats:3, bookedSeats:1, fare:350, vehicle:"Maruti Swift",    photo:null, ratings:[], postedBy:null, type:'trip'},
+  {id:6, name:"Deepa Gogoi",    phone:"8638512345", from:"Dibrugarh",to:"Guwahati",  time:"08:30", date:getTomorrowStr(), totalSeats:2, bookedSeats:0, fare:450, vehicle:"Toyota Innova",   photo:null, ratings:[5,5], postedBy:null, type:'trip'},
+  {id:7, name:"Kamal Das",      phone:"9365011122", from:"Guwahati", to:"Shillong",  time:"06:00", date:getTomorrowStr(), totalSeats:4, bookedSeats:2, fare:400, vehicle:"Mahindra Scorpio",photo:null, ratings:[4], postedBy:null, type:'seat'},
+];
+
+// ════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════
+let rides = loadRides() || JSON.parse(JSON.stringify(SEED_RIDES));
+let nextId = rides.length ? Math.max(...rides.map(r => r.id)) + 1 : 8;
+let filteredRides = [], currentPriceFilter = 0;
+let driverPhoto = null, ratingTargetId = null, currentRating = 0;
+let currentUser = null;
+let currentRideType = 'seat', currentPostType = 'seat', currentMyTab = 'seat';
+const users = {};
+
+// Load persisted users
+loadUsers();
+
+// ════════════════════════════════════════════
+//  LIVE SYNC via storage event
+//  (detects when another tab/window updates rides)
+// ════════════════════════════════════════════
+window.addEventListener('storage', e => {
+  if (e.key === LS_RIDES) {
+    const fresh = loadRides();
+    if (fresh) {
+      rides = fresh;
+      nextId = Math.max(...rides.map(r => r.id)) + 1;
+      // Re-render whatever is currently visible
+      if (document.getElementById('panel-search').classList.contains('active')) applyPriceFilter();
+      if (document.getElementById('panel-myrides').classList.contains('active')) renderMyRides();
+    }
+  }
+});
+
+// ════════════════════════════════════════════
+//  CITY LIST
+// ════════════════════════════════════════════
+const CITIES = [
+  {n:"Guwahati",t:"Assam"},{n:"Tezpur",t:"Assam"},{n:"Jorhat",t:"Assam"},
+  {n:"Dibrugarh",t:"Assam"},{n:"Silchar",t:"Assam"},{n:"Nagaon",t:"Assam"},
+  {n:"Tinsukia",t:"Assam"},{n:"Sivasagar",t:"Assam"},{n:"Bongaigaon",t:"Assam"},
+  {n:"Dhubri",t:"Assam"},{n:"North Lakhimpur",t:"Assam"},{n:"Golaghat",t:"Assam"},
+  {n:"Haflong",t:"Assam"},{n:"Diphu",t:"Assam"},{n:"Lumding",t:"Assam"},
+  {n:"Hojai",t:"Assam"},{n:"Rangia",t:"Assam"},{n:"Nalbari",t:"Assam"},
+  {n:"Barpeta",t:"Assam"},{n:"Kokrajhar",t:"Assam"},{n:"Duliajan",t:"Assam"},
+  {n:"Majuli",t:"Assam"},{n:"Biswanath",t:"Assam"},
+  {n:"Imphal",t:"Manipur"},{n:"Shillong",t:"Meghalaya"},{n:"Agartala",t:"Tripura"},
+  {n:"Aizawl",t:"Mizoram"},{n:"Itanagar",t:"Arunachal"},{n:"Kohima",t:"Nagaland"},
+  {n:"Kolkata",t:"West Bengal"},{n:"Delhi",t:"Delhi"},
+];
+
+function getSugg(q) {
+  const lq = q.trim().toLowerCase();
+  const posted = [...new Set(rides.flatMap(r => [r.from, r.to]))]
+    .filter(c => !CITIES.find(x => x.n.toLowerCase() === c.toLowerCase()))
+    .map(c => ({n:c, t:'Posted'}));
+  const pool = [...posted, ...CITIES];
+  return lq ? pool.filter(c => c.n.toLowerCase().includes(lq)).slice(0,8) : pool.slice(0,8);
+}
+
+// ════════════════════════════════════════════
+//  AUTOCOMPLETE
+// ════════════════════════════════════════════
+function acInput(inp, ddId) {
+  const dd = document.getElementById(ddId);
+  const s  = getSugg(inp.value);
+  if (!s.length) { dd.classList.remove('open'); return; }
+  dd.innerHTML = s.map(c =>
+    `<div class="ac-item" onmousedown="acPick('${inp.id}','${ddId}','${c.n.replace(/'/g,"\\'")}')">
+       📍 <span>${c.n}</span><span class="ac-tag">${c.t}</span>
+     </div>`).join('');
+  dd.classList.add('open');
+}
+function acPick(inpId, ddId, val) {
+  document.getElementById(inpId).value = val;
+  document.getElementById(ddId).classList.remove('open');
+  updatePreview();
+}
+function acBlur(ddId) {
+  setTimeout(() => document.getElementById(ddId).classList.remove('open'), 200);
+  updatePreview();
+}
+function acKey(e, ddId) {
+  const dd    = document.getElementById(ddId);
+  const items = [...dd.querySelectorAll('.ac-item')];
+  let hi = items.findIndex(i => i.classList.contains('hl'));
+  if (e.key === 'ArrowDown')  { e.preventDefault(); hi = Math.min(hi+1, items.length-1); }
+  else if (e.key === 'ArrowUp')   { e.preventDefault(); hi = Math.max(hi-1, 0); }
+  else if (e.key === 'Enter' && hi >= 0) { e.preventDefault(); items[hi].dispatchEvent(new MouseEvent('mousedown')); return; }
+  else if (e.key === 'Escape') { dd.classList.remove('open'); return; }
+  items.forEach((it,i) => it.classList.toggle('hl', i === hi));
+  if (hi >= 0) items[hi].scrollIntoView({block:'nearest'});
+}
+
+// ════════════════════════════════════════════
+//  UI STATE HELPERS
+// ════════════════════════════════════════════
+function setRideType(t) {
+  currentRideType = t;
+  document.getElementById('rt-seat').className = 'ride-type-pill' + (t==='seat' ? ' active-seat' : '');
+  document.getElementById('rt-trip').className = 'ride-type-pill' + (t==='trip' ? ' active-trip' : '');
+}
+function setPostType(t) {
+  currentPostType = t;
+  document.getElementById('ptt-seat').className = 'ptt-btn' + (t==='seat' ? ' active-seat' : '');
+  document.getElementById('ptt-trip').className = 'ptt-btn' + (t==='trip' ? ' active-trip' : '');
+  document.getElementById('ptb-banner').className = 'post-type-banner ' + (t==='seat' ? 'ptb-seat' : 'ptb-trip');
+  document.getElementById('ptb-title').textContent = t==='seat' ? 'Seat Share' : 'Trip Share';
+  document.getElementById('ptb-sub').textContent   = t==='seat' ? 'Offer spare seats in your vehicle' : 'Share your full car trip';
+  document.getElementById('post-btn').className     = 'btn-primary' + (t==='seat' ? ' green-btn' : '');
+}
+function setMyTab(t) {
+  currentMyTab = t;
+  document.getElementById('my-seat-btn').className = 'my-type-btn' + (t==='seat' ? ' act-seat' : '');
+  document.getElementById('my-trip-btn').className = 'my-type-btn' + (t==='trip' ? ' act-trip' : '');
+  renderMyRides();
+}
+function switchTab(tab) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => { b.classList.remove('active','green-active'); });
+  document.getElementById('panel-'+tab).classList.add('active');
+  const nb = document.getElementById('nav-'+tab);
+  nb.classList.add('active');
+  if (tab === 'myrides') nb.classList.add('green-active');
+  if (tab === 'myrides') renderMyRides();
+  if (tab === 'profile') renderProfile();
+}
+function showToast(msg, color) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = color ? color : 'var(--text)';
+  t.style.color      = color ? 'white' : 'var(--card)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+function togglePass(id) {
+  const i = document.getElementById(id);
+  i.type = i.type === 'password' ? 'text' : 'password';
+}
+function toggleDark() {
+  const d = document.getElementById('dark-toggle').checked;
+  document.documentElement.setAttribute('data-theme', d ? 'dark' : 'light');
+  localStorage.setItem(LS_DARK, d ? '1' : '0');
+}
+function updatePreview() {
+  const f  = (document.getElementById('d-from')?.value || '').trim();
+  const t  = (document.getElementById('d-to')?.value   || '').trim();
+  const pf = document.getElementById('preview-from');
+  const pt = document.getElementById('preview-to');
+  if (pf) { pf.textContent = f || 'From city…'; pf.classList.toggle('ph', !f); }
+  if (pt) { pt.textContent = t || 'To city…';   pt.classList.toggle('ph', !t); }
+}
+function swapRoute() {
+  const df = document.getElementById('d-from'), dt = document.getElementById('d-to');
+  [df.value, dt.value] = [dt.value, df.value];
+  updatePreview();
+}
+function swapSearch() {
+  const sf = document.getElementById('s-from'), st = document.getElementById('s-to');
+  [sf.value, st.value] = [st.value, sf.value];
+}
+
+// ════════════════════════════════════════════
+//  PHOTO
+// ════════════════════════════════════════════
+function handlePhoto(e) {
+  const file = e.target.files[0]; if (!file) return;
+  if (file.size > 4*1024*1024) { showToast('⚠️ Photo must be under 4MB', '#F03E3E'); return; }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    driverPhoto = ev.target.result;
+    document.getElementById('photo-ph-block').style.display = 'none';
+    const w = document.getElementById('photo-pw'); w.style.display = 'inline-block';
+    document.getElementById('photo-img').src = driverPhoto;
+    document.getElementById('photo-rm-btn').style.display = 'flex';
+  };
+  reader.readAsDataURL(file);
+}
+function removePhoto(e) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  driverPhoto = null;
+  document.getElementById('photo-file').value = '';
+  document.getElementById('photo-ph-block').style.display = 'block';
+  document.getElementById('photo-pw').style.display = 'none';
+  document.getElementById('photo-rm-btn').style.display = 'none';
+}
+
+// ════════════════════════════════════════════
+//  AUTH
+// ════════════════════════════════════════════
+function authTab(t) {
+  document.getElementById('tab-signin').classList.toggle('active', t==='signin');
+  document.getElementById('tab-signup').classList.toggle('active', t==='signup');
+  document.getElementById('auth-signin').style.display = t==='signin' ? 'block' : 'none';
+  document.getElementById('auth-signup').style.display = t==='signup' ? 'block' : 'none';
+}
+function doLogin() {
+  const phone = document.getElementById('li-phone').value.trim();
+  const pass  = document.getElementById('li-pass').value;
+  if (!phone || !pass) { showToast('⚠️ Enter phone number and password', '#F03E3E'); return; }
+  const u = users[phone];
+  if (!u || u.pass !== pass) { showToast('⚠️ Invalid phone number or password', '#F03E3E'); return; }
+  currentUser = u;
+  saveSession(phone);
+  renderProfile();
+  showToast('✅ Signed in as ' + u.name);
+}
+function doSignup() {
+  const name  = document.getElementById('su-name').value.trim();
+  const phone = document.getElementById('su-phone').value.trim();
+  const pass  = document.getElementById('su-pass').value;
+  if (!name || !phone || !pass) { showToast('⚠️ Please fill all fields', '#F03E3E'); return; }
+  if (phone.length < 10)        { showToast('⚠️ Enter a valid 10-digit number', '#F03E3E'); return; }
+  if (users[phone])              { showToast('⚠️ An account already exists with this number', '#F03E3E'); return; }
+  const u = {name, phone, pass, photo:null, bookings:0};
+  users[phone] = u;
+  saveUsers();
+  currentUser = u;
+  saveSession(phone);
+  renderProfile();
+  showToast('✅ Account created! Welcome, ' + name + '!');
+}
+function demoLogin() {
+  const u = {name:'Demo User', phone:'9999999999', pass:'demo', photo:null, bookings:2};
+  users['9999999999'] = u;
+  saveUsers();
+  currentUser = u;
+  saveSession('9999999999');
+  renderProfile();
+  showToast('👀 Signed in as Demo User');
+}
+function doLogout() {
+  currentUser = null;
+  saveSession('');
+  renderProfile();
+  showToast('👋 Signed out successfully');
+}
+function renderProfile() {
+  const ok = !!currentUser;
+  document.getElementById('view-login').style.display   = ok ? 'none'  : 'block';
+  document.getElementById('view-profile').style.display = ok ? 'block' : 'none';
+  const hdrAv = document.getElementById('hdr-avatar');
+  if (ok) {
+    document.getElementById('profile-name').textContent  = currentUser.name;
+    document.getElementById('profile-phone').textContent = '📞 ' + fmtPhone(currentUser.phone);
+    const av = document.getElementById('profile-avatar');
+    av.innerHTML = currentUser.photo
+      ? `<img src="${currentUser.photo}" alt="">`
+      : `${initials(currentUser.name)}`;
+    hdrAv.textContent = initials(currentUser.name);
+    const myR = rides.filter(r => r.postedBy === currentUser.phone);
+    document.getElementById('stat-rides').textContent    = myR.length;
+    document.getElementById('stat-bookings').textContent = currentUser.bookings;
+    const all = myR.flatMap(r => r.ratings);
+    document.getElementById('stat-rating').textContent   = all.length
+      ? (all.reduce((a,b) => a+b, 0) / all.length).toFixed(1) + '★'
+      : '—';
+  } else {
+    hdrAv.textContent = 'JS';
+  }
+}
+
+// ════════════════════════════════════════════
+//  POST RIDE  (saves to localStorage immediately)
+// ════════════════════════════════════════════
+function postRide() {
+  const name  = document.getElementById('d-name').value.trim();
+  const phone = document.getElementById('d-phone').value.trim();
+  const from  = document.getElementById('d-from').value.trim();
+  const to    = document.getElementById('d-to').value.trim();
+  const time  = document.getElementById('d-time').value;
+  const date  = document.getElementById('d-date').value;
+  const seats = parseInt(document.getElementById('d-seats').value);
+  const fare  = parseInt(document.getElementById('d-fare').value);
+  const veh   = document.getElementById('d-vehicle').value;
+
+  if (!name||!phone||!from||!to||!time||!date||!fare) { showToast('⚠️ Please fill all required fields!', '#F03E3E'); return; }
+  if (from.toLowerCase() === to.toLowerCase())         { showToast('⚠️ Pickup and drop cannot be the same city!', '#F03E3E'); return; }
+  if (phone.length < 10)  { showToast('⚠️ Enter a valid 10-digit phone number', '#F03E3E'); return; }
+  if (fare < 50 || fare > 5000) { showToast('⚠️ Fare must be between ₹50 and ₹5000', '#F03E3E'); return; }
+  if (date < getTodayStr()) { showToast('⚠️ Journey date cannot be in the past!', '#F03E3E'); return; }
+
+  const dup = rides.find(r =>
+    r.phone === phone && r.time === time && r.date === date &&
+    r.from.toLowerCase() === from.toLowerCase() &&
+    r.to.toLowerCase()   === to.toLowerCase()
+  );
+  if (dup) { showToast('⚠️ This ride has already been posted!', '#F03E3E'); return; }
+
+  // Add new city to suggestions if not already in list
+  [from, to].forEach(city => {
+    if (!CITIES.find(c => c.n.toLowerCase() === city.toLowerCase()))
+      CITIES.unshift({n:city, t:'Posted'});
+  });
+
+  const newRide = {
+    id: nextId++, name, phone, from, to, time, date,
+    totalSeats: seats, bookedSeats: 0, fare, vehicle: veh,
+    photo: driverPhoto || null, ratings: [],
+    postedBy: currentUser?.phone || null,
+    type: currentPostType,
+    postedAt: Date.now()
+  };
+  rides.unshift(newRide);
+  saveRides(); // ← persist immediately
+
+  // Reset form
+  ['d-name','d-phone','d-from','d-to','d-time'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('d-seats').value = '1';
+  document.getElementById('d-fare').value  = '300';
+  document.getElementById('d-date').value  = getTodayStr();
+  removePhoto(null);
+  updatePreview();
+
+  showToast('✅ Your ride has been posted successfully!');
+  document.getElementById('s-from').value = from;
+  document.getElementById('s-to').value   = to;
+  setRideType(currentPostType);
+  switchTab('search');
+  searchRides();
+}
+
+// ════════════════════════════════════════════
+//  SEARCH
+// ════════════════════════════════════════════
+function searchRides() {
+  purgeExpired();
+  const from = (document.getElementById('s-from').value || '').trim();
+  const to   = (document.getElementById('s-to').value   || '').trim();
+  const tFil = document.getElementById('s-time').value;
+  const dFil = document.getElementById('s-date').value;
+
+  if (!from && !to) { showToast('⚠️ Please enter at least one location', '#F03E3E'); return; }
+
+  const now = new Date(), today = getTodayStr();
+  filteredRides = rides.filter(r => {
+    if (r.type !== currentRideType) return false;
+    if (from && !r.from.toLowerCase().includes(from.toLowerCase())) return false;
+    if (to   && !r.to.toLowerCase().includes(to.toLowerCase()))     return false;
+    if (r.date < today) return false;
+    if (r.date === today) {
+      const [h,m] = r.time.split(':').map(Number);
+      const rt = new Date(); rt.setHours(h,m,0);
+      if (rt < now) return false;
+    }
+    if (dFil && r.date !== dFil) return false;
+    if (tFil && toMins(r.time) < toMins(tFil)) return false;
+    return true;
+  });
+  applyPriceFilter();
+}
+
+function filterPrice(max) {
+  currentPriceFilter = max;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  document.getElementById(max === 0 ? 'chip-all' : 'chip-'+max).classList.add('active');
+  applyPriceFilter();
+}
+function applyPriceFilter() {
+  const list = currentPriceFilter > 0
+    ? filteredRides.filter(r => r.fare < currentPriceFilter)
+    : filteredRides;
+  renderRides(list);
+}
+
+// ════════════════════════════════════════════
+//  RENDER RIDE CARDS
+// ════════════════════════════════════════════
+function renderRides(list) {
+  const from = (document.getElementById('s-from').value || '').trim();
+  const to   = (document.getElementById('s-to').value   || '').trim();
+  document.getElementById('filter-chips').style.display = filteredRides.length > 0 ? 'flex' : 'none';
+  document.getElementById('stats-bar').style.display    = 'flex';
+  document.getElementById('ride-count').textContent     = list.length;
+  document.getElementById('route-tag').textContent      = (from && to) ? `${from} → ${to}` : (from || to || '');
+  const C = document.getElementById('rides-container');
+  if (!list.length) {
+    C.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">😔</div>
+      <div class="empty-title">No rides found</div>
+      <div class="empty-sub">Try adjusting your filters or be the first to post a ride on this route!</div>
+    </div>`;
+    return;
+  }
+  C.innerHTML = list.map(r => buildCard(r, false)).join('');
+}
+
+function buildCard(r, isMine) {
+  const avail  = r.totalSeats - r.bookedSeats, full = avail <= 0;
+  const pct    = Math.round((r.bookedSeats / r.totalSeats) * 100);
+  const barCls = full ? 'full' : (pct >= 75 ? 'low' : '');
+  const ini    = initials(r.name);
+  const dateLabel = r.date === getTodayStr()    ? 'Today'
+                  : r.date === getTomorrowStr() ? 'Tomorrow'
+                  : fmtDate(r.date);
+  const avatarHtml = r.photo
+    ? `<img src="${r.photo}" alt="${ini}">`
+    : `${ini}`;
+  const avgRating = r.ratings.length
+    ? (r.ratings.reduce((a,b) => a+b, 0) / r.ratings.length) : 0;
+  const ratingStr = r.ratings.length
+    ? `${'★'.repeat(Math.round(avgRating))}${'☆'.repeat(5-Math.round(avgRating))} (${r.ratings.length})`
+    : '';
+  const isSeat = r.type === 'seat';
+
+  const actionBtns = isMine
+    ? `<div class="actions two">
+         <button class="abtn abtn-call" onclick="openContact(${r.id})">📞 Contact</button>
+         <button class="abtn abtn-del"  onclick="deleteRide(${r.id})">🗑 Delete</button>
+       </div>`
+    : `<div class="actions three">
+         <button class="abtn abtn-book" onclick="bookSeat(${r.id})" ${full ? 'disabled' : ''}>
+           ${full ? '🚫 Full' : '✅ Book'}
+         </button>
+         <button class="abtn abtn-call" onclick="openContact(${r.id})">📞 Call</button>
+         <button class="abtn abtn-wa"   onclick="openWA(${r.id})">💬 WA</button>
+       </div>`;
+
+  return `
+  <div class="ride-card${full ? ' is-full' : ''}${isMine ? ' mine-card' : ''}">
+    <div class="card-type-band ${isMine ? 'band-mine' : isSeat ? 'band-seat' : 'band-trip'}"></div>
+    <div class="card-top">
+      <div class="driver-row">
+        <div class="d-avatar">${avatarHtml}</div>
+        <div>
+          <div class="d-name">${r.name}
+            <span class="tag-type ${isSeat ? 'tag-seat' : 'tag-trip'}">${isSeat ? '💺 Seat' : '🚗 Trip'}</span>
+            ${full    ? '<span class="tag-full">FULL</span>' : ''}
+            ${isMine  ? '<span class="tag-mine">MINE</span>' : ''}
+          </div>
+          <div class="d-sub">🚗 ${r.vehicle}</div>
+        </div>
+      </div>
+      <div class="fare-pill ${isSeat ? '' : 'trip-fare'}">₹${r.fare}</div>
+    </div>
+    <div class="route-band">
+      <span class="rb-from">📍 ${r.from}</span>
+      <span class="rb-arrow">──→</span>
+      <span class="rb-to">🏁 ${r.to}</span>
+    </div>
+    ${ratingStr ? `<div class="star-line">${ratingStr}</div>` : ''}
+    <div class="info-grid">
+      <div class="ig"><div class="ig-l">⏰ Time</div><div class="ig-v">${to12hr(r.time)}</div></div>
+      <div class="ig"><div class="ig-l">📅 Date</div><div class="ig-v">${dateLabel}</div></div>
+      <div class="ig"><div class="ig-l">💺 Seats</div><div class="ig-v">${avail}/${r.totalSeats}</div></div>
+      <div class="ig"><div class="ig-l">💰 Fare</div><div class="ig-v">₹${r.fare}</div></div>
+    </div>
+    <div class="sbar-wrap">
+      <div class="sbar-meta">
+        <span>${full
+          ? '<span class="sbar-full-txt">Fully Booked</span>'
+          : `<span class="sbar-avail">${avail} seat${avail!==1?'s':''} left</span>`}</span>
+        <span>${r.bookedSeats}/${r.totalSeats} booked</span>
+      </div>
+      <div class="sbar-bg"><div class="sbar-fill ${barCls}" style="width:${pct}%"></div></div>
+    </div>
+    ${!isMine && r.bookedSeats > 0
+      ? `<button class="abtn abtn-rate" onclick="openRateModal(${r.id})">⭐ Rate this Driver</button>`
+      : ''}
+    ${actionBtns}
+  </div>`;
+}
+
+// ════════════════════════════════════════════
+//  MY RIDES
+// ════════════════════════════════════════════
+function renderMyRides() {
+  const myRides = currentUser
+    ? rides.filter(r => r.postedBy === currentUser.phone && r.type === currentMyTab)
+    : [];
+  const C = document.getElementById('my-rides-container');
+  if (!myRides.length) {
+    C.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">${currentMyTab === 'seat' ? '💺' : '🚗'}</div>
+      <div class="empty-title">${currentUser ? 'No ' + currentMyTab + ' rides posted' : 'Sign in to see your rides'}</div>
+      <div class="empty-sub">${currentUser
+        ? 'Post a ' + currentMyTab + ' ride to manage it here.'
+        : 'Go to the Profile tab to sign in.'}</div>
+    </div>`;
+    return;
+  }
+  C.innerHTML = `<div class="rides-list">${myRides.map(r => buildCard(r, true)).join('')}</div>`;
+}
+
+function deleteRide(id) {
+  if (!confirm('Are you sure you want to delete this ride?')) return;
+  rides = rides.filter(r => r.id !== id);
+  saveRides(); // ← persist deletion
+  renderMyRides();
+  showToast('🗑 Ride deleted successfully');
+}
+
+// ════════════════════════════════════════════
+//  BOOK SEAT  (saves updated bookedSeats count)
+// ════════════════════════════════════════════
+function bookSeat(id) {
+  const r = rides.find(x => x.id === id); if (!r) return;
+  if (r.totalSeats - r.bookedSeats <= 0) { showToast('🚫 No seats available on this ride!', '#F03E3E'); return; }
+  r.bookedSeats++;
+  if (currentUser) currentUser.bookings++;
+  saveRides(); // ← persist booking
+  const left = r.totalSeats - r.bookedSeats;
+  showToast(left > 0
+    ? `✅ Seat booked! ${left} seat${left!==1?'s':''} remaining.`
+    : '✅ Last seat booked! This ride is now full.');
+  applyPriceFilter();
+}
+
+// ════════════════════════════════════════════
+//  CONTACT & WHATSAPP
+// ════════════════════════════════════════════
+function openContact(id) {
+  const r = rides.find(x => x.id === id); if (!r) return;
+  const avgR = r.ratings.length
+    ? (r.ratings.reduce((a,b) => a+b, 0) / r.ratings.length).toFixed(1)
+    : null;
+  const av = document.getElementById('m-avatar');
+  av.innerHTML = r.photo
+    ? `<img src="${r.photo}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:18px">`
+    : `${initials(r.name)}`;
+  document.getElementById('m-name').textContent    = '👤 ' + r.name;
+  document.getElementById('m-vehicle').textContent = r.vehicle + ' · ' + to12hr(r.time) + ' · ' + fmtDate(r.date);
+  document.getElementById('m-route').textContent   = '📍 ' + r.from + ' → 🏁 ' + r.to;
+  document.getElementById('m-rating').textContent  = avgR
+    ? `${'★'.repeat(Math.round(parseFloat(avgR)))} ${avgR}/5 (${r.ratings.length} rating${r.ratings.length!==1?'s':''})`
+    : 'No ratings yet';
+  document.getElementById('m-phone').textContent   = '📞 ' + fmtPhone(r.phone);
+  document.getElementById('m-call').href = 'tel:' + r.phone;
+  document.getElementById('m-wa').href   = waLink(r);
+  document.getElementById('modal').classList.add('show');
+}
+function openWA(id) {
+  const r = rides.find(x => x.id === id); if (!r) return;
+  window.open(waLink(r), '_blank');
+}
+function waLink(r) {
+  return 'https://wa.me/91' + r.phone + '?text=' +
+    encodeURIComponent(
+      `Hello ${r.name}! I saw your ride on JatraShare ` +
+      `(${r.from} → ${r.to}, ${fmtDate(r.date)} at ${to12hr(r.time)}). ` +
+      `Is a seat still available?`
+    );
+}
+function closeMBg(e) { if (e.target === document.getElementById('modal')) closeModal(); }
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+// ════════════════════════════════════════════
+//  RATING  (saves updated ratings array)
+// ════════════════════════════════════════════
+function openRateModal(id) {
+  ratingTargetId = id; currentRating = 0;
+  const r = rides.find(x => x.id === id);
+  document.getElementById('rate-modal-sub').textContent = 'Rate your experience with ' + r.name;
+  document.getElementById('rate-comment').value = '';
+  updateStarUI(0);
+  document.getElementById('rate-modal').classList.add('show');
+}
+function setRating(n) { currentRating = n; updateStarUI(n); }
+function updateStarUI(n) {
+  const spans = document.querySelectorAll('#star-rate-row span');
+  spans.forEach((s,i) => {
+    s.textContent = i < n ? '⭐' : '☆';
+    s.style.filter = i < n ? 'none' : 'grayscale(1)';
+  });
+}
+function submitRating() {
+  if (!currentRating) { showToast('⚠️ Please select a star rating', '#F03E3E'); return; }
+  const r = rides.find(x => x.id === ratingTargetId);
+  if (r) { r.ratings.push(currentRating); saveRides(); } // ← persist rating
+  closeRateModal();
+  showToast('⭐ Rating submitted! Thank you.');
+  applyPriceFilter();
+}
+function closeRateModal() {
+  document.getElementById('rate-modal').classList.remove('show');
+  ratingTargetId = null; currentRating = 0;
+}
+function closeRateMBg(e) { if (e.target === document.getElementById('rate-modal')) closeRateModal(); }
+
+// ════════════════════════════════════════════
+//  AUTO-PURGE expired rides every 60 seconds
+// ════════════════════════════════════════════
+function purgeExpired() {
+  const now = new Date(), today = getTodayStr();
+  const before = rides.length;
+  rides = rides.filter(r => {
+    if (r.date < today) return false;
+    if (r.date === today) {
+      const [h,m] = r.time.split(':').map(Number);
+      const rt = new Date(); rt.setHours(h,m,0);
+      return rt >= now;
+    }
+    return true;
+  });
+  if (rides.length !== before) saveRides(); // save only if something was purged
+}
+setInterval(purgeExpired, 60000);
+
+// ════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════
+(function init() {
+  // Set date defaults
+  document.getElementById('d-date').value = getTodayStr();
+  document.getElementById('d-date').min   = getTodayStr();
+  document.getElementById('s-date').min   = getTodayStr();
+
+  // Hide photo remove button initially
+  document.getElementById('photo-rm-btn').style.display = 'none';
+
+  // Restore dark mode
+  if (localStorage.getItem(LS_DARK) === '1') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.getElementById('dark-toggle').checked = true;
+  }
+
+  // Restore logged-in session
+  const savedPhone = loadSession();
+  if (savedPhone && users[savedPhone]) {
+    currentUser = users[savedPhone];
+    renderProfile();
+  }
+
+  // Initial purge of expired seed data
+  purgeExpired();
+})();
+</script>
+</body>
+</html>
